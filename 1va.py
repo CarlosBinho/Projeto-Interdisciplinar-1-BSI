@@ -1,52 +1,61 @@
-usuario_senha = {"admin" : "senha123"}
-produtos = []
-vendas = []
-despesas = []
+import os
+import json
 
-# Funcionalidade 1: LOGIN DO USUÁRIO
+# Função para limpar a tela do terminal
+def clear_screen():
+    os.system('cls' if os.name == 'nt' else 'clear')
+
+# Função para carregar dados de um arquivo txt
+def carregar_dados(nome_arquivo):
+    try:
+        with open(nome_arquivo, 'r') as arquivo:
+            return json.load(arquivo)
+    except FileNotFoundError:
+        return []
+    except json.JSONDecodeError:
+        return []
+
+# Função para salvar dados em um arquivo txt
+def salvar_dados(nome_arquivo, dados):
+    with open(nome_arquivo, 'w') as arquivo:
+        json.dump(dados, arquivo, indent=4)
+
+# Carregar os dados ao iniciar o programa
+produtos = carregar_dados('produtos.txt')
+vendas = carregar_dados('vendas.txt')
+despesas = carregar_dados('despesas.txt')
+
+# Dicionário de usuário e senha para login
+usuario_senha = {"admin": "senha123"}
+
+# Função de login do usuário
 def login():
-    usuario = input("Digite o login/usuário: ")
-    senha = input("Digite a senha: ")
-    if usuario in usuario_senha and senha == usuario_senha["admin"]:
-        print("Login executado com sucesso!")
-        menu_principal()
-    else:
-        print("Usuário ou Senha incorreto!")
-        login()
+    while True:
+        clear_screen()
+        usuario = input("Digite o login/usuário: ")
+        senha = input("Digite a senha: ")
+        if usuario in usuario_senha and senha == usuario_senha["admin"]:
+            print("Login executado com sucesso!")
+            input("Pressione Enter para continuar...")  # Pausa antes de continuar
+            break
+        else:
+            print("Usuário ou Senha incorreto!")
+            input("Pressione Enter para tentar novamente...")  # Pausa para leitura da mensagem
 
-# Funcionalidade 2: EXIBIÇÃO DE INFORMAÇÕES NO MENU PRINCIPAL
-def exibir_relatorio_menu():
-    faturamento_atual = 0
-    for venda in vendas:
-        faturamento_atual += venda['preco'] * venda['quantidade']
+    clear_screen()
+    menu_principal()  # Chama o menu principal após login bem-sucedido
 
-    total_produtos_estoque = 0
-    for produto in produtos:
-        total_produtos_estoque += produto['quantidade']
-
-    total_despesas = 0
-    for despesa in despesas:
-        total_despesas += despesa['valor']
-
-    balanco_atual = faturamento_atual - total_despesas
-
-    print("\nInformações Gerais:")
-    print(f"Faturamento Atual: R${faturamento_atual:.2f}")
-    print(f"Total de Produtos no Estoque: {total_produtos_estoque:.2f}")
-    print(f"Total de Despesas: R${total_despesas:.2f}")
-    print(f"Balanço Atual: R${balanco_atual:.2f}")
-
-# Funcionalidade 3: MENU PRINCIPAL
+# Função para exibir o menu principal
 def menu_principal():
     while True:
+        clear_screen()
         print("\nMenu Principal")
         print("1. Controle de Estoque")
         print("2. Controle Financeiro")
-        print("3. Relátorios")
+        print("3. Relatórios")
         print("4. Configurações")
         print("5. Sair")
         opcao = input("Escolha uma opção: ")
-        exibir_relatorio_menu()
 
         if opcao == "1":
             controle_estoque()
@@ -58,13 +67,18 @@ def menu_principal():
             configuracoes()
         elif opcao == "5":
             print("Saindo do programa...")
+            input("Pressione Enter para sair...")
             break
         else:
             print("Opção inválida! Tente novamente.")
+            input("Pressione Enter para continuar...")  # Pausa para leitura da mensagem
 
-# Funcionalidade 4: CONTROLE DE ESTOQUE
+        clear_screen()
+
+# Menu para controle de estoque
 def controle_estoque():
     while True:
+        clear_screen()
         print("\nControle de Estoque")
         print("1. Adicionar Produto")
         print("2. Atualizar Produto")
@@ -85,30 +99,39 @@ def controle_estoque():
             break
         else:
             print("Opção inválida! Tente novamente.")
+            input("Pressione Enter para continuar...")  # Pausa para leitura da mensagem
 
+        clear_screen()
 
-# Funcionalidade 4.1: ADICIONAR PRODUTO
+# Função para adicionar um novo produto ao estoque
 def adicionar_produto():
-    nome = input("Nome do produto: ")
-    quantidade = int(input("Quantidade: "))
-    preco_custo = float(input("Preço de custo: "))
-    preco_venda = float(input("Preço de venda: "))
-    categoria = input("Categoria: ")
-    descricao = input("Descrição (opcional): ")
+    try:
+        nome = input("Nome do produto: ")
+        quantidade = int(input("Quantidade: "))
+        preco_custo = float(input("Preço de custo: "))
+        preco_venda = float(input("Preço de venda: "))
+        categoria = input("Categoria: ")
+        descricao = input("Descrição (opcional): ")
 
-    novo_produto = {
-        "nome": nome,
-        "quantidade": quantidade,
-        "preco_custo": preco_custo,
-        "preco_venda": preco_venda,
-        "categoria": categoria,
-        "descricao": descricao,
-    }
+        novo_produto = {
+            "nome": nome,
+            "quantidade": quantidade,
+            "preco_custo": preco_custo,
+            "preco_venda": preco_venda,
+            "categoria": categoria,
+            "descricao": descricao,
+        }
 
-    produtos.append(novo_produto)
-    print("Produto adicionado com sucesso!")
+        produtos.append(novo_produto)
+        salvar_dados('produtos.txt', produtos)
+        print("Produto adicionado com sucesso!")
+    except ValueError:
+        print("Erro: Por favor, insira valores numéricos válidos para quantidade e preços.")
+    
+    input("Pressione Enter para continuar...")
+    clear_screen()
 
-# Funcionalidade 4.2: ATUALIZAR PRODUTO
+# Função para atualizar um produto existente no estoque
 def atualizar_produto():
     nome = input("Nome do produto a ser atualizado: ")
     produto = None
@@ -118,31 +141,38 @@ def atualizar_produto():
             break
 
     if produto:
-        novo_nome = input("Novo nome do produto (ou Enter para manter o atual): ")
-        nova_quantidade = input("Nova quantidade (ou Enter para manter a atual): ")
-        novo_preco_custo = input("Novo preço de custo (ou Enter para manter o atual): ")
-        novo_preco_venda = input("Novo preço de venda (ou Enter para manter o atual): ")
-        nova_categoria = input("Nova categoria (ou Enter para manter a atual): ")
-        nova_descricao = input("Nova descrição (ou Enter para manter a atual): ")
+        try:
+            novo_nome = input("Novo nome do produto (ou Enter para manter o atual): ")
+            nova_quantidade = input("Nova quantidade (ou Enter para manter a atual): ")
+            novo_preco_custo = input("Novo preço de custo (ou Enter para manter o atual): ")
+            novo_preco_venda = input("Novo preço de venda (ou Enter para manter o atual): ")
+            nova_categoria = input("Nova categoria (ou Enter para manter a atual): ")
+            nova_descricao = input("Nova descrição (ou Enter para manter a atual): ")
 
-        if novo_nome:
-            produto['nome'] = novo_nome
-        if nova_quantidade:
-            produto['quantidade'] = int(nova_quantidade)
-        if novo_preco_custo:
-            produto['preco_custo'] = float(novo_preco_custo)
-        if novo_preco_venda:
-            produto['preco_venda'] = float(novo_preco_venda)
-        if nova_categoria:
-            produto['categoria'] = nova_categoria
-        if nova_descricao:
-            produto['descricao'] = nova_descricao
+            if novo_nome:
+                produto['nome'] = novo_nome
+            if nova_quantidade:
+                produto['quantidade'] = int(nova_quantidade)
+            if novo_preco_custo:
+                produto['preco_custo'] = float(novo_preco_custo)
+            if novo_preco_venda:
+                produto['preco_venda'] = float(novo_preco_venda)
+            if nova_categoria:
+                produto['categoria'] = nova_categoria
+            if nova_descricao:
+                produto['descricao'] = nova_descricao
 
-        print("Produto atualizado com sucesso!")
+            salvar_dados('produtos.txt', produtos)
+            print("Produto atualizado com sucesso!")
+        except ValueError:
+            print("Erro: Por favor, insira valores numéricos válidos para quantidade e preços.")
     else:
         print("Produto não encontrado!")
 
-# Funcionalidade 4.3: REMOVER PRODUTO
+    input("Pressione Enter para continuar...")
+    clear_screen()
+
+# Função para remover um produto do estoque
 def remover_produto():
     nome = input("Nome do produto a ser removido: ")
     produto = None
@@ -153,11 +183,15 @@ def remover_produto():
 
     if produto:
         produtos.remove(produto)
+        salvar_dados('produtos.txt', produtos)
         print("Produto removido com sucesso!")
     else:
         print("Produto não encontrado!")
 
-# Funcionalidade 4.4: VISUALIZAR ESTOQUE
+    input("Pressione Enter para continuar...")
+    clear_screen()
+
+# Função para visualizar todos os produtos no estoque
 def visualizar_estoque():
     if not produtos:
         print("Nenhum produto no estoque!")
@@ -165,9 +199,13 @@ def visualizar_estoque():
         for produto in produtos:
             print(f"Nome: {produto['nome']}, Quantidade: {produto['quantidade']}, Preço de Custo: {produto['preco_custo']:.2f}, Preço de Venda: {produto['preco_venda']:.2f}, Categoria: {produto['categoria']}, Descrição: {produto['descricao']}")
 
-# Funcionalidade 5: MENU CONTROLE FINANCEIRO
+    input("Pressione Enter para continuar...")
+    clear_screen()
+
+# Menu para controle financeiro
 def controle_financeiro():
     while True:
+        clear_screen()
         print("\nControle Financeiro")
         print("1. Registro de Vendas")
         print("2. Registro de Despesas")
@@ -185,39 +223,57 @@ def controle_financeiro():
             break
         else:
             print("Opção inválida! Tente novamente.")
+            input("Pressione Enter para continuar...")  # Pausa para leitura da mensagem
 
-# Funcionalidade 5.1: REGISTRO DE VENDAS
+        clear_screen()
+
+# Função para registrar uma nova venda
 def registro_vendas():
     produto_nome = input("Nome do produto vendido: ")
-    quantidade_vendida = int(input("Quantidade vendida: "))
-    preco_venda = float(input("Preço de venda: "))
-    data_venda = input("Data da venda (dd/mm/yyyy): ")
+    try:
+        quantidade_vendida = int(input("Quantidade vendida: "))
+        preco_venda = float(input("Preço de venda: "))
+        data_venda = input("Data da venda (dd/mm/yyyy): ")
 
-    produto = None
-    for p in produtos:
-        if p['nome'] == produto_nome:
-            produto = p
-            break
+        produto = None
+        for p in produtos:
+            if p['nome'] == produto_nome:
+                produto = p
+                break
 
-    if produto and produto['quantidade'] >= quantidade_vendida:
-        produto['quantidade'] -= quantidade_vendida
-        venda = {"produto": produto_nome, "quantidade": quantidade_vendida, "preco": preco_venda, "data": data_venda}
-        vendas.append(venda)
-        print("Venda registrada com sucesso!")
-    else:
-        print("Produto não encontrado ou quantidade insuficiente!")
+        if produto and produto['quantidade'] >= quantidade_vendida:
+            produto['quantidade'] -= quantidade_vendida
+            venda = {"produto": produto_nome, "quantidade": quantidade_vendida, "preco": preco_venda, "data": data_venda}
+            vendas.append(venda)
+            salvar_dados('produtos.txt', produtos)
+            salvar_dados('vendas.txt', vendas)
+            print("Venda registrada com sucesso!")
+        else:
+            print("Produto não encontrado ou quantidade insuficiente!")
+    except ValueError:
+        print("Erro: Por favor, insira valores numéricos válidos para quantidade e preço.")
 
-# Funcionalidade 5.2: REGISTRO DE DESPESAS
+    input("Pressione Enter para continuar...")
+    clear_screen()
+
+# Função para registrar uma nova despesa
 def registro_despesas():
-    tipo_despesa = input("Tipo de despesa: ")
-    valor = float(input("Valor: "))
-    data = input("Data da despesa (dd/mm/yyyy): ")
+    try:
+        tipo_despesa = input("Tipo de despesa: ")
+        valor = float(input("Valor: "))
+        data = input("Data da despesa (dd/mm/yyyy): ")
 
-    despesa = {"tipo": tipo_despesa, "valor": valor, "data": data}
-    despesas.append(despesa)
-    print("Despesa registrada com sucesso!")
+        despesa = {"tipo": tipo_despesa, "valor": valor, "data": data}
+        despesas.append(despesa)
+        salvar_dados('despesas.txt', despesas)
+        print("Despesa registrada com sucesso!")
+    except ValueError:
+        print("Erro: Por favor, insira um valor numérico válido para a despesa.")
+    
+    input("Pressione Enter para continuar...")
+    clear_screen()
 
-# Funcionalidade 5.3: RELÁTORIOS FINANCEIROS
+# Função para visualizar relatórios financeiros
 def visualizar_relatorios_financeiros():
     total_vendas = 0
     for venda in vendas:
@@ -231,9 +287,13 @@ def visualizar_relatorios_financeiros():
     print(f"Total de Despesas: R${total_despesas:.2f}")
     print(f"Balanço: R${(total_vendas - total_despesas):.2f}")
 
-# Funcionalidade 6: RELATÓRIOS
+    input("Pressione Enter para continuar...")
+    clear_screen()
+
+# Menu para relatórios
 def relatorios():
     while True:
+        clear_screen()
         print("\nRelatórios")
         print("1. Relatório de Estoque")
         print("2. Relatório Financeiro")
@@ -248,10 +308,14 @@ def relatorios():
             break
         else:
             print("Opção inválida! Tente novamente.")
+            input("Pressione Enter para continuar...")  # Pausa para leitura da mensagem
 
-# Funcionalidade 7: MENU CONFIGURAÇÕES
+        clear_screen()
+
+# Menu de configurações
 def configuracoes():
     while True:
+        clear_screen()
         print("\nConfigurações")
         print("1. Mudar Login e Senha")
         print("2. Voltar ao Menu Principal")
@@ -263,8 +327,11 @@ def configuracoes():
             break
         else:
             print("Opção inválida! Tente novamente.")
+            input("Pressione Enter para continuar...")  # Pausa para leitura da mensagem
 
-# Funcionalidade 7.1: MUDAR LOGIN E SENHA
+        clear_screen()
+
+# Função para mudar login e senha
 def mudar_login_senha():
     usuario_atual = input("Nome de usuário atual: ")
     senha_atual = input("Senha atual: ")
@@ -275,10 +342,13 @@ def mudar_login_senha():
 
         usuario_senha[novo_usuario] = nova_senha
         del usuario_senha[usuario_atual]
-
         print("Nome de usuário e senha alterados com sucesso!")
     else:
         print("Usuário ou senha atual incorretos!")
 
-# Iniciar o programa
-login()
+    input("Pressione Enter para continuar...")
+    clear_screen()
+
+# Iniciar o programa chamando a função de login
+if __name__ == "__main__":
+    login()
