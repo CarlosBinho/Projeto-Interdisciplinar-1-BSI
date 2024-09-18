@@ -81,5 +81,17 @@ Este programa utiliza algumas bibliotecas padrão do Python para lidar com opera
   - 09 Filtros
   - 10 Sugestões
 
+## Colaboração e Futuro do projeto
+**Caso queira contribuir com o projeto:** <br> <br>
+Para as próximas versões do sistema, estão planejadas as seguintes melhorias: <br> <br>
+Integração com Sistema de Pagamento: Implementação de um módulo que permita o registro automático de pagamentos, conectando o sistema a plataformas de pagamento digital. <br> <br>
+Backup e Restauração de Dados: Uma funcionalidade que permita fazer backup automático dos dados de estoque e finanças, garantindo segurança em caso de falha no sistema. <br> <br>
+Interface Gráfica: O desenvolvimento de uma interface gráfica amigável para o sistema, facilitando ainda mais o uso por pessoas que não estão habituadas com comandos em terminal. <br> <br>
+Otimização da ideia: é necessário fazer pesquisas científicas e de campo para determinar um padrão geral do que é de fato necessário e de extrema importância no mercado de pequenos negócios, pois assim conseguiremos ser mais assertivos nas funcionalidades do programa. <br> <br>
+Especializações: Após todos os passos anteriores estarem concluídos podemos criar versões do aplicativo especializada em determinados nichos, caso haja necessidade, por exemplo, versão para feirantes, versão para lojistas de roupas, versão para pequenos empreendimentos em casa, etc. Isso serve como uma extensão a mais da base do aplicativo que atenda de forma mais eficiente determinados sub-nichos.
+
+## Utilização do projeto
+Para usar o projeto basta dar um git clone com o link deste repositório remoto e executar único arquivo .py existente, no vscode.
+
 ## Fluxograma
 Segue abaixo o link para acessar o fluxograma do código (projeto) <br> [Fluxograma](https://drive.google.com/file/d/1jqZXmKtdp-6-nEeoddlaPEWiUNkSab-u/view?usp=sharing)
